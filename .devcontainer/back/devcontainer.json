@@ -1,0 +1,16 @@
+{
+	"name": "📡 Backend",
+	"dockerComposeFile": ["../../compose.yaml"],
+	"workspaceFolder": "/app",
+	"service": "backend",
+	"overrideCommand": true,
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"GitHub.copilot",
+				"rangav.vscode-thunder-client",
+				"oven.bun-vscode"
+			]
+		}
+	}
+}

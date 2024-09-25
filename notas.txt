@@ -1,0 +1,4 @@
+NOTAS:
+
+1. Los contenedores no se deben ejecutar al entrar, se deben ejecutar los servicios con F5
+2. Cambiar la libreria de nombre, asi no figura netnix
