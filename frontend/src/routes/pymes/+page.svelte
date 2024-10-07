@@ -105,7 +105,9 @@
     </thead>
     <tbody>
       {#each coordenadas as pyme (pyme.name)}
-        <tr>
+      <tr class:green={pyme.trabajoRealizado === 'Sustentabilidad'} 
+          class:blue={pyme.trabajoRealizado === 'innovación'} 
+          class:yellow={pyme.trabajoRealizado === 'Transformación Digital'}>
           <td class="border border-gray-300 px-4 py-2">{pyme.name}</td>
           <td class="border border-gray-300 px-4 py-2">{pyme.lat}</td>
           <td class="border border-gray-300 px-4 py-2">{pyme.lng}</td>
@@ -117,3 +119,15 @@
     </tbody>
   </table>
 </div>
+
+<style>
+  .green {
+    background-color: greenyellow;
+  }
+  .yellow {
+    background-color: yellow;
+  }
+  .blue {
+    background-color: blue;
+  }
+</style>
