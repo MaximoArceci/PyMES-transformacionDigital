@@ -30,50 +30,48 @@
       class="w-full bg-blue-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-600 transition-colors ease-in-out">
       Aplicar filtro
     </button>
-
-    <div>
-      <label for="sector" class="block text-gray-700 text-sm font-medium mb-2">Filtrar por Sector:</label>
-      <select 
-        id="sector" 
-        bind:value={sectorFiltro} 
-        class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm transition ease-in-out hover:border-blue-400 hover:shadow-lg">
-        <option value={null}>Mostrar todos</option>
-        <option value="Servicios">Servicios</option>
-        <option value="Tecnología">Tecnología</option>
-        <option value="Automotriz">Automotriz</option>
-        <option value="Comunicaciones">Comunicaciones</option>
-        <option value="Moda">Moda</option>
-      </select>
-    </div>
     
     <div>
       <label for="trabajoRealizado" class="block text-gray-700 text-sm font-medium mb-2">Filtrar por trabajo realizado:</label>
       <select 
-        id="trabajoRealizado" 
-        bind:value={trabajoRealizadoFiltro} 
-        class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm transition ease-in-out hover:border-blue-400 hover:shadow-lg">
-        <option value={null}>Mostrar todos</option>
-        <option value="Sustentabilidad">Sustentabilidad</option>
-        <option value="Transformación digital">Transformación digital</option>
-        <option value="Mejora de procesos">Mejora de procesos</option>
-        <option value="Innovación">Innovación</option>
-      </select>
-    </div>
-    
-    <div>
-      <label for="tipoEmpresa" class="block text-gray-700 text-sm font-medium mb-2">Filtrar por tipo de empresa:</label>
-      <select 
-        id="tipoEmpresa" 
-        bind:value={tipoEmpresaFiltro} 
-        class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm transition ease-in-out hover:border-blue-400 hover:shadow-lg">
-        <option value={null}>Mostrar todos</option>
-        <option value="Consultoría ambiental">Consultoría ambiental</option>
-        <option value="Desarrollo de software">Desarrollo de software</option>
-        <option value="Taller mecánico">Taller mecánico</option>
-        <option value="Marketing digital">Marketing digital</option>
-        <option value="Textil">Textil</option>
-      </select>
-    </div>
+      id="trabajoRealizado" 
+      bind:value={trabajoRealizadoFiltro} 
+      class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm transition ease-in-out hover:border-blue-400 hover:shadow-lg">
+      <option value={null}>Mostrar todos</option>
+      <option value="Sustentabilidad">Sustentabilidad</option>
+      <option value="Transformación Digital">Transformación Digital</option>
+      <option value="innovación">innovación</option>
+    </select>
+  </div>
+  
+  <div>
+    <label for="tipoEmpresa" class="block text-gray-700 text-sm font-medium mb-2">Filtrar por tipo de empresa:</label>
+    <select 
+    id="tipoEmpresa" 
+    bind:value={tipoEmpresaFiltro} 
+    class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm transition ease-in-out hover:border-blue-400 hover:shadow-lg">
+    <option value={null}>Mostrar todos</option>
+    <option value="Micro-Pyme">Micro-Pyme</option>
+    <option value="PyME">PyME</option>
+    <option value="Mediana Tramo 1">Mediana Tramo 1</option>
+  </select>
+</div>
+
+  <div>
+    <label for="sector" class="block text-gray-700 text-sm font-medium mb-2">Filtrar por Sector:</label>
+    <select 
+      id="sector" 
+      bind:value={sectorFiltro} 
+      class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm transition ease-in-out hover:border-blue-400 hover:shadow-lg">
+      <option value={null}>Mostrar todos</option>
+      <option value="Servicios">Servicios</option>
+      <option value="Metalúrgico">Metalúrgico</option>
+      <option value="Gráfico">Gráfico</option>
+      <option value="Fabrica">Fabrica</option>
+      <option value="Textil">Textil</option>
+      <option value="Alimentos">Alimentos</option>
+    </select>
+  </div>
     
   </div>
 
@@ -83,7 +81,7 @@
       <Map view={[puntoVista[0].lat, puntoVista[0].lng]}>
         {#if coordenadas.length > 0}
           {#each coordenadas as coordenada}
-          <Marker latLng={[coordenada.lat, coordenada.lng]}></Marker>
+          <Marker latLng={[parseFloat(coordenada.lat), parseFloat(coordenada.lng)]}></Marker>
           {/each}
         {/if}
       </Map>

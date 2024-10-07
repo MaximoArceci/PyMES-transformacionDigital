@@ -24,6 +24,9 @@
 	"type": "module",
 	"dependencies": {
 		"@netnix/leaflet-sveltekit": "^1.0.7",
-		"openapi-fetch": "^0.12.0"
+		"csv-parser": "^3.0.0",
+		"node-fetch": "^3.3.2",
+		"openapi-fetch": "^0.12.0",
+		"papaparse": "^5.4.1"
 	}
 }
