@@ -1,133 +1,176 @@
 <script lang="ts">
-	import { Map, Marker } from "@netnix/leaflet-sveltekit";
+	import { onMount } from 'svelte';
+  import pinAmarillo  from '$lib/assets/pinAmarillo.png';
+  import pinRojo  from '$lib/assets/pinRojo.png';
+  import pinVerde  from '$lib/assets/pinVerde.png';
+
 	export let data;
-	let coordenadasTotales:any = data.pymes;
-  let puntoVista:any = [{lat: -34.5729,lng: -58.433123}]
-  let coordenadas:any = coordenadasTotales;
-  let sectorFiltro:any = null;
-  let trabajoRealizadoFiltro:any = null;
-  let tipoEmpresaFiltro:any = null;
-	
-  function cambiarCoords() {
-    coordenadas = coordenadasTotales;
-    if (sectorFiltro !== null){
-    coordenadas = coordenadas.filter((i:any) => i.sector == sectorFiltro);
+
+	let map;
+	let markers: any[] = [];
+	let coordenadasTotales = data.pymes;
+	let coordenadas = coordenadasTotales;
+
+	let puntoVista = { lat: -34.5729, lng: -58.433123 };
+	let sectorFiltro = null;
+	let trabajoRealizadoFiltro = null;
+	let tipoEmpresaFiltro = null;
+
+	let L; // guardamos el módulo leaflet
+
+	async function iniciarMapa() {
+		L = await import('leaflet');
+		await import('leaflet/dist/leaflet.css');
+
+		map = L.map('map').setView([puntoVista.lat, puntoVista.lng], 12);
+
+		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			attribution: '&copy; OpenStreetMap contributors'
+		}).addTo(map);
+
+		renderizarMarcadores();
+	}
+
+	function limpiarMarcadores() {
+		markers.forEach((m) => map.removeLayer(m));
+		markers = [];
+	}
+
+	function renderizarMarcadores() {
+	if (!L || !map) return;
+
+	limpiarMarcadores();
+
+	// Define el ícono usando tu imagen personalizada
+  
+	for (const pyme of coordenadas) {
+    if (!pyme.lat || !pyme.lng) continue;
+    let customIcon = L.icon({
+      iconUrl: pinAmarillo,  // Asegúrate de que la ruta sea correcta según la estructura de tu proyecto
+      iconSize: [50, 50],  // Tamaño de la imagen (ajusta según el tamaño de tu imagen)
+      iconAnchor: [15, 30],  // El punto de anclaje para el marcador (ajusta según la imagen)
+      popupAnchor: [0, -30],  // El punto donde se abre el popup relativo al ícono
+      shadowSize: [50, 50],  // Si tienes una sombra para el marcador, ajusta el tamaño de la sombra
+    });
+    if (pyme.trabajoRealizado == "Transformación Digital") {
+      customIcon = L.icon({
+        iconUrl: pinRojo,  // Cambia a la imagen roja para este caso
+        iconSize: [50, 50],
+        iconAnchor: [15, 30],
+        popupAnchor: [0, -30],
+        shadowSize: [50, 50],
+      });
+    } else if (pyme.trabajoRealizado == "Sustentabilidad") {
+      customIcon = L.icon({
+        iconUrl: pinVerde,  // Cambia a la imagen amarilla para este caso
+        iconSize: [50, 50],
+        iconAnchor: [15, 30],
+        popupAnchor: [0, -30],
+        shadowSize: [50, 50],
+      });
+    } else if (pyme.trabajoRealizado == "innovación") {
+      customIcon = L.icon({
+        iconUrl: pinAmarillo,  // Cambia a la imagen roja para este caso
+        iconSize: [50, 50],
+        iconAnchor: [15, 30],
+        popupAnchor: [0, -30],
+        shadowSize: [50, 50],
+      });
     }
-    if (trabajoRealizadoFiltro !== null){
-      coordenadas = coordenadas.filter((i:any) => i.trabajoRealizado == trabajoRealizadoFiltro);
-    }
-    if (tipoEmpresaFiltro !== null){
-      coordenadas = coordenadas.filter((i:any) => i.tipoEmpresa == tipoEmpresaFiltro);
-    }
+
+		// Crea el marcador con el ícono personalizado
+		const marker = L.marker([parseFloat(pyme.lat), parseFloat(pyme.lng)], { icon: customIcon })
+			.addTo(map)
+			.bindPopup(`
+				<b>${pyme.name}</b><br>
+				Trabajo: ${pyme.trabajoRealizado}<br>
+				Tipo: ${pyme.tipoEmpresa}<br>
+				Sector: ${pyme.sector}
+			`);
+		markers.push(marker);
+	}
 }
+
+
+	function cambiarCoords() {
+		coordenadas = coordenadasTotales;
+
+		if (sectorFiltro !== null) {
+			coordenadas = coordenadas.filter((i: any) => i.sector === sectorFiltro);
+		}
+		if (trabajoRealizadoFiltro !== null) {
+			coordenadas = coordenadas.filter((i: any) => i.trabajoRealizado === trabajoRealizadoFiltro);
+		}
+		if (tipoEmpresaFiltro !== null) {
+			coordenadas = coordenadas.filter((i: any) => i.tipoEmpresa === tipoEmpresaFiltro);
+		}
+
+		renderizarMarcadores();
+	}
+
+	onMount(() => {
+		iniciarMapa();
+	});
 </script>
 
 <div class="flex flex-col lg:flex-row lg:space-x-6 m-4">
-  <!-- Filtros en una columna -->
-  <div class="w-full lg:w-1/3 space-y-4">
-    <button 
-      on:click={cambiarCoords} 
-      class="w-full bg-blue-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-600 transition-colors ease-in-out">
-      Aplicar filtro
-    </button>
-    
-    <div>
-      <label for="trabajoRealizado" class="block text-gray-700 text-sm font-medium mb-2">Filtrar por trabajo realizado:</label>
-      <select 
-      id="trabajoRealizado" 
-      bind:value={trabajoRealizadoFiltro} 
-      class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm transition ease-in-out hover:border-blue-400 hover:shadow-lg">
-      <option value={null}>Mostrar todos</option>
-      <option value="Sustentabilidad">Sustentabilidad</option>
-      <option value="Transformación Digital">Transformación Digital</option>
-      <option value="innovación">innovación</option>
-    </select>
-  </div>
-  
-  <div>
-    <label for="tipoEmpresa" class="block text-gray-700 text-sm font-medium mb-2">Filtrar por tipo de empresa:</label>
-    <select 
-    id="tipoEmpresa" 
-    bind:value={tipoEmpresaFiltro} 
-    class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm transition ease-in-out hover:border-blue-400 hover:shadow-lg">
-    <option value={null}>Mostrar todos</option>
-    <option value="Micro-Pyme">Micro-Pyme</option>
-    <option value="PyME">PyME</option>
-    <option value="Mediana Tramo 1">Mediana Tramo 1</option>
-  </select>
+	<!-- Filtros -->
+	<div class="w-full lg:w-1/3 space-y-4">
+		<button
+			on:click={cambiarCoords}
+			class="w-full bg-blue-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-600 transition-colors ease-in-out"
+		>
+			Aplicar filtro
+		</button>
+
+		<div>
+			<label for="trabajoRealizado" class="block text-gray-700 text-sm font-medium mb-2">Filtrar por trabajo realizado:</label>
+			<select
+				id="trabajoRealizado"
+				bind:value={trabajoRealizadoFiltro}
+				class="w-full p-3 border border-gray-300 rounded-md"
+			>
+				<option value={null}>Mostrar todos</option>
+				<option value="Sustentabilidad">Sustentabilidad</option>
+				<option value="Transformación Digital">Transformación Digital</option>
+				<option value="innovación">innovación</option>
+			</select>
+		</div>
+
+		<div>
+			<label for="tipoEmpresa" class="block text-gray-700 text-sm font-medium mb-2">Filtrar por tipo de empresa:</label>
+			<select
+				id="tipoEmpresa"
+				bind:value={tipoEmpresaFiltro}
+				class="w-full p-3 border border-gray-300 rounded-md"
+			>
+				<option value={null}>Mostrar todos</option>
+				<option value="Micro-Pyme">Micro-Pyme</option>
+				<option value="PyME">PyME</option>
+				<option value="Mediana Tramo 1">Mediana Tramo 1</option>
+			</select>
+		</div>
+
+		<div>
+			<label for="sector" class="block text-gray-700 text-sm font-medium mb-2">Filtrar por Sector:</label>
+			<select
+				id="sector"
+				bind:value={sectorFiltro}
+				class="w-full p-3 border border-gray-300 rounded-md"
+			>
+				<option value={null}>Mostrar todos</option>
+				<option value="Servicios">Servicios</option>
+				<option value="Metalúrgico">Metalúrgico</option>
+				<option value="Gráfico">Gráfico</option>
+				<option value="Fabrica">Fabrica</option>
+				<option value="Textil">Textil</option>
+				<option value="Alimentos">Alimentos</option>
+			</select>
+		</div>
+	</div>
+
+	<!-- Mapa -->
+	<div class="w-full lg:w-2/3 h-[800px] border border-gray-300 rounded-lg overflow-hidden shadow-md mt-6 lg:mt-0">
+		<div id="map" class="w-full h-full rounded-lg"></div>
+	</div>
 </div>
-
-  <div>
-    <label for="sector" class="block text-gray-700 text-sm font-medium mb-2">Filtrar por Sector:</label>
-    <select 
-      id="sector" 
-      bind:value={sectorFiltro} 
-      class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm transition ease-in-out hover:border-blue-400 hover:shadow-lg">
-      <option value={null}>Mostrar todos</option>
-      <option value="Servicios">Servicios</option>
-      <option value="Metalúrgico">Metalúrgico</option>
-      <option value="Gráfico">Gráfico</option>
-      <option value="Fabrica">Fabrica</option>
-      <option value="Textil">Textil</option>
-      <option value="Alimentos">Alimentos</option>
-    </select>
-  </div>
-    
-  </div>
-
-  <!-- Mapa -->
-  <div class="w-full lg:w-2/3 h-[500px] border border-gray-300 rounded-lg overflow-hidden shadow-md mt-6 lg:mt-0">
-    {#if puntoVista}
-      <Map view={[puntoVista[0].lat, puntoVista[0].lng]}>
-        {#if coordenadas.length > 0}
-          {#each coordenadas as coordenada}
-          <Marker latLng={[parseFloat(coordenada.lat), parseFloat(coordenada.lng)]}></Marker>
-          {/each}
-        {/if}
-      </Map>
-    {/if}
-  </div>
-</div>
-
-<!-- Tabla de información debajo del mapa -->
-<div class="m-4">
-  <h2 class="text-xl font-semibold mb-4">Información de las PYMEs seleccionadas:</h2>
-  <table class="min-w-full table-auto border-collapse border border-gray-300 text-left">
-    <thead>
-      <tr class="bg-gray-100">
-        <th class="border border-gray-300 px-4 py-2">Nombre</th>
-        <th class="border border-gray-300 px-4 py-2">Latitud</th>
-        <th class="border border-gray-300 px-4 py-2">Longitud</th>
-        <th class="border border-gray-300 px-4 py-2">Trabajo Realizado</th>
-        <th class="border border-gray-300 px-4 py-2">Tipo de Empresa</th>
-        <th class="border border-gray-300 px-4 py-2">Sector</th>
-      </tr>
-    </thead>
-    <tbody>
-      {#each coordenadas as pyme (pyme.name)}
-      <tr class:green={pyme.trabajoRealizado === 'Sustentabilidad'} 
-          class:blue={pyme.trabajoRealizado === 'innovación'} 
-          class:yellow={pyme.trabajoRealizado === 'Transformación Digital'}>
-          <td class="border border-gray-300 px-4 py-2">{pyme.name}</td>
-          <td class="border border-gray-300 px-4 py-2">{pyme.lat}</td>
-          <td class="border border-gray-300 px-4 py-2">{pyme.lng}</td>
-          <td class="border border-gray-300 px-4 py-2">{pyme.trabajoRealizado}</td>
-          <td class="border border-gray-300 px-4 py-2">{pyme.tipoEmpresa}</td>
-          <td class="border border-gray-300 px-4 py-2">{pyme.sector}</td>
-        </tr>
-      {/each}
-    </tbody>
-  </table>
-</div>
-
-<style>
-  .green {
-    background-color: greenyellow;
-  }
-  .yellow {
-    background-color: yellow;
-  }
-  .blue {
-    background-color: blue;
-  }
-</style>
