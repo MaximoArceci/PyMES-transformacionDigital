@@ -113,9 +113,10 @@
 	});
 </script>
 
-<div class="flex flex-col lg:flex-row lg:space-x-6 m-4">
+<div class="bg-gray-300 min-h-screen p-4">
+<div class="flex flex-col lg:flex-row lg:space-x-6 m-4 ">
 	<!-- Filtros -->
-	<div class="w-full lg:w-1/3 space-y-4">
+	<div class="w-full lg:w-1/5 space-y-4">
 		<button
 			on:click={cambiarCoords}
 			class="w-full bg-blue-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-600 transition-colors ease-in-out"
@@ -128,7 +129,7 @@
 			<select
 				id="trabajoRealizado"
 				bind:value={trabajoRealizadoFiltro}
-				class="w-full p-3 border border-gray-300 rounded-md"
+				class="w-full p-3 border border-gray-300 rounded-md bg-gray-200"
 			>
 				<option value={null}>Mostrar todos</option>
 				<option value="Sustentabilidad">Sustentabilidad</option>
@@ -142,7 +143,7 @@
 			<select
 				id="tipoEmpresa"
 				bind:value={tipoEmpresaFiltro}
-				class="w-full p-3 border border-gray-300 rounded-md"
+				class="w-full p-3 border border-gray-300 rounded-md bg-gray-200"
 			>
 				<option value={null}>Mostrar todos</option>
 				<option value="Micro-Pyme">Micro-Pyme</option>
@@ -156,7 +157,7 @@
 			<select
 				id="sector"
 				bind:value={sectorFiltro}
-				class="w-full p-3 border border-gray-300 rounded-md"
+				class="w-full p-3 border border-gray-300 rounded-md bg-gray-200"
 			>
 				<option value={null}>Mostrar todos</option>
 				<option value="Servicios">Servicios</option>
@@ -170,7 +171,8 @@
 	</div>
 
 	<!-- Mapa -->
-	<div class="w-full lg:w-2/3 h-[800px] border border-gray-300 rounded-lg overflow-hidden shadow-md mt-6 lg:mt-0">
+	<div class="w-full lg:w-4/5 h-[950px] border border-gray-300 rounded-lg overflow-hidden shadow-md mt-6 lg:mt-0">
 		<div id="map" class="w-full h-full rounded-lg"></div>
 	</div>
+</div>
 </div>
