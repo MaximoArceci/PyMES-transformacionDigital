@@ -13,6 +13,31 @@ services:
     networks:
       - internal
     command: bash -c 'sleep 2 && bun install && bun run dev --host'
+  
+  django:
+    image: python:3.12-slim
+    working_dir: /app
+    volumes:
+      - ./admin-api:/app
+    command: >
+      sh -c "pip install -r requirements.txt &&
+            python manage.py makemigrations &&
+            python manage.py migrate &&
+            python manage.py runserver 0.0.0.0:9000"
+    ports:
+      - "9000:9000"
+    environment:
+      - DATABASE_POSTGRES_URL=postgresql://<user>:<password>@yamanote.proxy.rlwy.net:23053/postgres
+      - DB_NAME=railway
+      - DB_USER=postgres
+      - DB_PASSWORD=dSRkrxNEkBcjgFEufNrrnbjIhboGAtwh
+      - DB_HOST=yamanote.proxy.rlwy.net
+      - DB_PORT=23053
+    networks:
+      - internal
     
 networks:
   internal:
+
+volumes:
+  admin-api:
