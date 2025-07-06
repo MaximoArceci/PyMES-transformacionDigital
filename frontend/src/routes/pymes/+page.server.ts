@@ -1,6 +1,6 @@
 export const load = async () => {
   try {
-    const response = await fetch('http://django:9000/api/pyme/', {
+    const response = await fetch('http://adaptable-courage-production.up.railway.app/api/pyme/', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
