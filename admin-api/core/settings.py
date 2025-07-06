@@ -28,6 +28,10 @@ SECRET_KEY = 'django-insecure-ck5amptiyl3(!+oh#65pj=+vg88$k)xm(l^qg_urj*4rbw=q8)
 DEBUG = True
 ALLOWED_HOSTS = ['*']
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://adaptable-courage-production.up.railway.app'
+]
+
 # SCIM_USER_MODEL = 'adminApi.SCIMUser'
 
 
