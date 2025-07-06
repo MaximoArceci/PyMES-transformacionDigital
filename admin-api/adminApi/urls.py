@@ -7,13 +7,13 @@ from django.contrib import admin
 # Registrar automáticamente todos los modelos en la API
 router = DefaultRouter()
 
-# for model_name, viewset in viewsets_dict.items():
-#     router.register(model_name.lower(), viewset)
+for model_name, viewset in viewsets_dict.items():
+    router.register(model_name.lower(), viewset)
 
 urlpatterns = [ 
     path('admin/', admin.site.urls),
-    path('api/', include(router.urls)),  # API REST
-    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),  # Esquema OpenAPI
-    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),  # UI Swagger
-    path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc')
+    path('/', include(router.urls)),  # API REST
+    path('schema/', SpectacularAPIView.as_view(), name='schema'),  # Esquema OpenAPI
+    path('docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),  # UI Swagger
+    path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc')
 ]

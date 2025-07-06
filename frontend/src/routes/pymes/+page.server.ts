@@ -1,31 +1,31 @@
-import fs from 'fs';
-import Papa from 'papaparse';
-
 export const load = async () => {
   try {
-    // Leer el archivo CSV local
-    const csvFile = fs.readFileSync('./pymes.csv', 'utf8');
-
-    // Parsear el CSV usando papaparse
-    const parsedData = Papa.parse(csvFile, {
-      header: true,  // Usar la primera fila como cabeceras
+    const response = await fetch('http://django:9000/api/pyme/', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Basic YWRtaW46cGFzc3dvcmQ='
+      }
     });
 
-    // Convertir los datos en el formato esperado
-    const pymes:any = parsedData.data.map((pyme: any) => ({
-      name: pyme['Nombre de Fantasia'],
-      lat: parseFloat(pyme['Latitud'].replace(',', '.')), 
-      lng: parseFloat(pyme['Longitud'].replace(',', '.')), 
-      trabajoRealizado: pyme['Trabajo realizado'],
-      tipoEmpresa: pyme['Tipo de empresa'],
-      sector: pyme['Sector']
+    if (!response.ok) {
+      throw new Error(`Error al obtener las pymes: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    const pymes = data.results.map((pyme: any) => ({
+      name: pyme.name,
+      lat: parseFloat(pyme.latitud.replace(',', '.')),
+      lng: parseFloat(pyme.longitud.replace(',', '.')),
+      trabajoRealizado: pyme.work_type,
+      tipoEmpresa: pyme.enterprise_type,
+      sector: pyme.sector
     }));
-    console.log(pymes);
 
     return { pymes };
   } catch (e) {
-    console.error('Error al leer el archivo CSV:', e);
+    console.error('Error al obtener las pymes desde el endpoint:', e);
     throw e;
   }
 };
-
