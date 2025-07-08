@@ -15,6 +15,7 @@
 	let sectorFiltro = null;
 	let trabajoRealizadoFiltro = null;
 	let tipoEmpresaFiltro = null;
+	let maduracionFiltro = null;
 
 	let L; // guardamos el módulo leaflet
 
@@ -85,7 +86,8 @@
 				<b>${pyme.name}</b><br>
 				Trabajo: ${pyme.trabajoRealizado}<br>
 				Tipo: ${pyme.tipoEmpresa}<br>
-				Sector: ${pyme.sector}
+				Sector: ${pyme.sector}<br>
+				Nivel de Maduración: ${pyme.nivelMaduracion}<br>
 			`);
 		markers.push(marker);
 	}
@@ -103,6 +105,9 @@
 		}
 		if (tipoEmpresaFiltro !== null) {
 			coordenadas = coordenadas.filter((i: any) => i.tipoEmpresa === tipoEmpresaFiltro);
+		}
+		if (maduracionFiltro !== null) {
+			coordenadas = coordenadas.filter((i: any) => i.nivelMaduracion === maduracionFiltro);
 		}
 
 		renderizarMarcadores();
@@ -166,6 +171,20 @@
 				<option value="Fabrica">Fabrica</option>
 				<option value="Textil">Textil</option>
 				<option value="Alimentos">Alimentos</option>
+			</select>
+		</div>
+
+		<div>
+			<label for="maduracion" class="block text-sm font-medium mb-2 text-white">Filtrar por Nivel de Maduración:</label>
+			<select
+				id="maduracion"
+				bind:value={maduracionFiltro}
+				class="w-full p-3 border border-white rounded-md bg-slate-900 text-white"
+			>
+				<option value={null}>Mostrar todos</option>
+				<option value="inicial">inicial</option>
+				<option value="medio">medio</option>
+				<option value="alto">alto</option>
 			</select>
 		</div>
 	</div>

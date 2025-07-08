@@ -1,6 +1,6 @@
 export const load = async () => {
   try {
-    const response = await fetch('http://adaptable-courage-production.up.railway.app/api/pyme/', {
+    const response = await fetch('http://django:9000/api/pyme/', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -20,7 +20,8 @@ export const load = async () => {
       lng: parseFloat(pyme.longitud.replace(',', '.')),
       trabajoRealizado: pyme.work_type,
       tipoEmpresa: pyme.enterprise_type,
-      sector: pyme.sector
+      sector: pyme.sector,
+      nivelMaduracion: pyme.nivelMaduracion
     }));
 
     return { pymes };
