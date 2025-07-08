@@ -8,9 +8,9 @@ class Pyme(models.Model):
         SUSTENTABILIDAD = 'Sustentabilidad', 'Sustentabilidad'
 
     class NivelMaduracionOptions(models.TextChoices):
-        INICIAL = 'inicial', 'Inicial'
-        MEDIO = 'medio', 'Medio'
-        ALTO = 'alto', 'Alto'
+        INICIAL = 'inicial'
+        MEDIO = 'medio'
+        ALTO = 'alto'
 
     class SectorOptions(models.TextChoices):
         SERVICIOS = 'Servicios', 'Servicios'
