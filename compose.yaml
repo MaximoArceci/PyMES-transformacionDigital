@@ -12,7 +12,7 @@ services:
       - ./frontend:/app
     networks:
       - internal
-    command: bash -c 'sleep 2 && bun install && bun run dev --host'
+    command: bash -c 'bun install && bun run dev --host'
   
   django:
     image: python:3.12-slim
