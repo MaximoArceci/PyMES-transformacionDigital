@@ -21,7 +21,7 @@ export const load = async () => {
       trabajoRealizado: pyme.work_type,
       tipoEmpresa: pyme.enterprise_type,
       sector: pyme.sector,
-      nivelMaduracion: pyme.nivelMaduracion
+      nivelMaduracion: pyme.nivelMaduracion.charAt(0).toUpperCase() + pyme.nivelMaduracion.slice(1)
     }));
 
     return { pymes };

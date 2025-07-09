@@ -182,9 +182,9 @@
 				class="w-full p-3 border border-white rounded-md bg-slate-900 text-white"
 			>
 				<option value={null}>Mostrar todos</option>
-				<option value="inicial">inicial</option>
-				<option value="medio">medio</option>
-				<option value="alto">alto</option>
+				<option value="Inicial">Inicial</option>
+				<option value="Medio">Medio</option>
+				<option value="Alto">Alto</option>
 			</select>
 		</div>
 	</div>
