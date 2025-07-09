@@ -14,7 +14,7 @@ export const load = async () => {
 
     const data = await response.json();
 
-    const pymes = data.results.map((pyme: any) => ({
+    const pymes = data.map((pyme: any) => ({
       name: pyme.name,
       lat: parseFloat(pyme.latitud.replace(',', '.')),
       lng: parseFloat(pyme.longitud.replace(',', '.')),
