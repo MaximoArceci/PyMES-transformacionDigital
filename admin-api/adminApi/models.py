@@ -4,7 +4,7 @@ class Pyme(models.Model):
 
     class WorkTypeOptions(models.TextChoices):
         TRANSFORMACION_DIGITAL = 'Transformación Digital', 'Transformación Digital'
-        INNOVACION = 'innovacion', 'Innovación'
+        INNOVACION = 'innovación', 'Innovación'
         SUSTENTABILIDAD = 'Sustentabilidad', 'Sustentabilidad'
 
     class NivelMaduracionOptions(models.TextChoices):
