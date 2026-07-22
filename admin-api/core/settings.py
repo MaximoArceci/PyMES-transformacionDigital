@@ -16,21 +16,19 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SALT_KEY = '0123456789abcdefghijklmnopqrstuvwxyz'
+SALT_KEY = os.getenv('SALT_KEY', 'development-only-salt')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ck5amptiyl3(!+oh#65pj=+vg88$k)xm(l^qg_urj*4rbw=q8)'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'unsafe-development-key-change-me')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = os.getenv('DJANGO_DEBUG', 'False').lower() == 'true'
-DEBUG = True
-ALLOWED_HOSTS = ['*']
+DEBUG = os.getenv('DJANGO_DEBUG', 'False').lower() == 'true'
+ALLOWED_HOSTS = [host.strip() for host in os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',') if host.strip()]
 
-CSRF_TRUSTED_ORIGINS = [
-    'https://adaptable-courage-production.up.railway.app'
-]
+CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in os.getenv('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',') if origin.strip()]
 
 # SCIM_USER_MODEL = 'adminApi.SCIMUser'
 
@@ -143,8 +141,8 @@ REST_FRAMEWORK = {
     # 'DEFAULT_AUTHENTICATION_CLASSES': (
     #     'rest_framework_simplejwt.authentication.JWTAuthentication',
     # ),
-	 'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.BasicAuthentication',
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     # 'DEFAULT_PERMISSION_CLASSES': [
     #     'adminApi.permissions.StrictDjangoModelPermissions',  # Solo autenticados pueden acceder
@@ -166,5 +164,4 @@ REST_FRAMEWORK = {
 #         },
 #     ],
 # }
-
 

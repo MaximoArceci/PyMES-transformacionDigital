@@ -1,255 +1,29 @@
 <script lang="ts">
-    import { quintOut } from 'svelte/easing';
-    import { crossfade } from 'svelte/transition';
-
-    // Recibimos los datos del archivo page.server.ts
-    export let data;
-
-    // Estado para controlar el modal
-    let modalOpen = false;
-    let selectedEvent: any = null;
-
-    // Estado para controlar la categoría de eventos seleccionada
-    let selectedCategory = 'Eventos y conferencias';
-
-    // Estado para controlar el tipo de evento seleccionado
-    let selectedEventType = 'Todos';
-
-    // Función para abrir el modal con un evento específico
-    function openModal(evento: any) {
-        selectedEvent = evento;
-        modalOpen = true;
-    }
-
-    // Función para cerrar el modal
-    function closeModal() {
-        modalOpen = false;
-        selectedEvent = null;
-    }
-
-    // Los colores de las etiquetas de tipo de evento
-    const getEventTypeClass = (tipo: string | undefined) => {
-        if (!tipo) {
-            return "bg-gray-500";
-        }
-        // Normalizamos la cadena para que la primera letra esté en mayúscula
-        const formattedTipo = tipo.charAt(0).toUpperCase() + tipo.slice(1);
-        switch (formattedTipo) {
-            case "Conferencia":
-                return "bg-blue-600";
-            case "Hackathon":
-                return "bg-green-600";
-            case "Evento":
-                return "bg-purple-600";
-            case "Competencia":
-                return "bg-red-600";
-            case "Taller":
-                return "bg-yellow-600";
-            case "Premio":
-                return "bg-orange-600";
-            case "Congreso":
-                return "bg-teal-600";
-            case "Charla":
-                return "bg-indigo-600";
-            case "Crédito":
-                return "bg-emerald-600"; // Nuevo color para financiamientos de crédito
-            default:
-                return "bg-gray-500";
-        }
-    };
-
-    // Obtiene una lista de tipos de eventos únicos, excluyendo los valores 'undefined'
-    // y normaliza la capitalización para el filtro
-    $: eventTypes = data.eventos ? ['Todos', ...new Set(data.eventos.filter(e => e.tipoEvento).map(e => e.tipoEvento.charAt(0).toUpperCase() + e.tipoEvento.slice(1)))] : ['Todos'];
-
-
-    // Filtra los eventos según la categoría y el tipo seleccionados
-    $: filteredEvents = (() => {
-        if (!data.eventos || !data.financiamientos) return [];
-
-        let eventsToFilter = selectedCategory === 'Eventos y conferencias'
-            ? data.eventos
-            : data.financiamientos;
-
-        if (selectedCategory === 'Eventos y conferencias' && selectedEventType !== 'Todos') {
-            eventsToFilter = eventsToFilter.filter(evento => {
-                // Se agrega esta verificación para evitar el error si tipoEvento es undefined
-                if (!evento.tipoEvento) {
-                    return false;
-                }
-                const formattedTipo = evento.tipoEvento.charAt(0).toUpperCase() + evento.tipoEvento.slice(1);
-                return formattedTipo === selectedEventType;
-            });
-        }
-
-        return eventsToFilter;
-    })();
-
-    // Resetea el filtro de tipo de evento cuando se cambia la categoría
-    $: {
-        if (selectedCategory === 'Financiaciones') {
-            selectedEventType = 'Todos';
-        }
-    }
-    
-    // Handler para eventos de teclado
-    function handleKeyDown(event: KeyboardEvent, evento: any) {
-        if (event.key === 'Enter' || event.key === ' ') {
-            openModal(evento);
-        }
-    }
-
+  export let data;
+  type EventItem = { nombre:string;organizacion?:string;link:string;tipoEvento?:string;descripcion?:string;fecha?:string;lugar?:string };
+  let category: 'events'|'funding' = 'events';
+  let eventType = '';
+  let selected: EventItem | null = null;
+  $: types = [...new Set((data.eventos as EventItem[]).map((item) => item.tipoEvento).filter(Boolean))] as string[];
+  $: source = category === 'events' ? data.eventos : data.financiamientos;
+  $: items = eventType && category === 'events' ? source.filter((item:EventItem) => item.tipoEvento === eventType) : source;
+  $: visibleItems = items.filter((item:EventItem) => item.nombre && item.link);
 </script>
 
-<!-- Contenedor principal con padding y un título grande -->
-<div class="p-8 bg-slate-900 min-h-screen">
-  <h1 class="text-4xl font-extrabold text-center text-white mb-12 leading-tight">
-    Últimos y Próximos Eventos de Tecnología en la Región
-  </h1>
-  
-  <!-- Contenedor de botones de filtrado de categoría -->
-  <div class="flex justify-center space-x-4 mb-4">
-    <button
-      on:click={() => selectedCategory = 'Eventos y conferencias'}
-      class="py-2 px-6 rounded-full font-medium transition-colors duration-200
-             {selectedCategory === 'Eventos y conferencias' ? 'bg-blue-600 text-white shadow-lg' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}"
-    >
-      Eventos y conferencias
-    </button>
-    <button
-      on:click={() => selectedCategory = 'Financiaciones'}
-      class="py-2 px-6 rounded-full font-medium transition-colors duration-200
-             {selectedCategory === 'Financiaciones' ? 'bg-blue-600 text-white shadow-lg' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}"
-    >
-      Financiaciones
-    </button>
-  </div>
+<svelte:head><title>Antena Tecnológica · PyMEs</title></svelte:head>
+<svelte:window on:keydown={(event)=>event.key==='Escape'&&(selected=null)} />
+<main class="antenna page-shell">
+  <header><p class="eyebrow">Oportunidades para crecer</p><h1 class="display-title">Antena Tecnológica</h1><p>Eventos, conocimiento y financiación para impulsar la transformación de tu empresa.</p></header>
+  <section class="controls"><div class="tabs"><button class:active={category==='events'} on:click={()=>category='events'}>Eventos y conferencias</button><button class:active={category==='funding'} on:click={()=>category='funding'}>Financiaciones</button></div>{#if category==='events'}<label>Tipo de evento<select class="field" bind:value={eventType}><option value="">Todos</option>{#each types as type}<option>{type}</option>{/each}</select></label>{/if}</section>
+  {#if data.error}<div class="notice" role="status">{data.error}</div>{/if}
+  {#if items.length}
+    <section class="cards">{#each visibleItems as item}<button class="event-card" on:click={()=>selected=item}><span class="event-type">{item.tipoEvento||'Oportunidad'}</span><h2>{item.nombre}</h2><span class="organization">{item.organizacion||'Organización no informada'}</span>{#if item.fecha||item.lugar}<span class="metadata">{#if item.fecha}<span>▣ {item.fecha}</span>{/if}{#if item.lugar}<span>⌖ {item.lugar}</span>{/if}</span>{/if}<span class="description">{item.descripcion||'Consultá la fuente para conocer todos los detalles.'}</span><span class="more">Ver información →</span></button>{/each}</section>
+  {:else}<div class="empty"><h2>No hay oportunidades disponibles</h2><p>Volvé a intentar más tarde o elegí otra categoría.</p></div>{/if}
+  <p class="disclaimer">Información generada y procesada con asistencia de inteligencia artificial. Verificá siempre los datos en la fuente original.</p>
+</main>
 
-  <!-- Filtro por tipo de evento -->
-  {#if selectedCategory === 'Eventos y conferencias'}
-  <div class="flex justify-center mb-8">
-    <label for="eventTypeFilter" class="text-white font-medium mr-2 self-center">Filtrar por tipo:</label>
-    <select 
-      id="eventTypeFilter"
-      bind:value={selectedEventType}
-      class="bg-slate-700 text-white rounded-lg p-2"
-    >
-      {#each eventTypes as tipo}
-        <option value={tipo}>{tipo}</option>
-      {/each}
-    </select>
-  </div>
-  {/if}
+{#if selected}<div class="modal-backdrop"><article class="modal" role="dialog" aria-modal="true" aria-labelledby="event-title"><button class="close" aria-label="Cerrar" on:click={()=>selected=null}>×</button><span class="event-type">{selected.tipoEvento||'Oportunidad'}</span><h2 id="event-title">{selected.nombre}</h2><p class="organization">{selected.organizacion}</p>{#if selected.fecha}<p>▣ {selected.fecha}</p>{/if}{#if selected.lugar}<p>⌖ {selected.lugar}</p>{/if}<p class="modal-description">{selected.descripcion}</p><a class="btn-primary" href={selected.link} target="_blank" rel="noopener noreferrer">Ver fuente original →</a></article></div>{/if}
 
-  <!-- Contenedor de las tarjetas, usando un grid responsivo -->
-  <div class="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-    <!-- El bucle each ahora usa los eventos filtrados -->
-    {#if filteredEvents.length > 0}
-      {#each filteredEvents.filter(e => e.nombre && e.link) as evento}
-        <!-- Tarjeta individual para cada evento, ahora con bg-slate-800 -->
-        <div class="bg-slate-800 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden cursor-pointer" 
-             on:click={() => openModal(evento)}
-             on:keydown={(e) => handleKeyDown(e, evento)}
-             role="button"
-             tabindex="0"
-        >
-          <div class="p-6 flex flex-col h-full text-white">
-            <!-- Tipo de evento -->
-            {#if evento.tipoEvento}
-              <div class="flex items-center mb-3">
-                <span class="text-sm font-semibold px-3 py-1 rounded-full text-white {getEventTypeClass(evento.tipoEvento)}">
-                  {evento.tipoEvento.charAt(0).toUpperCase() + evento.tipoEvento.slice(1)}
-                </span>
-              </div>
-            {/if}
-            
-            <!-- Título y organización -->
-            <h3 class="text-xl font-bold mb-2 flex-grow">{evento.nombre}</h3>
-            {#if evento.organizacion}
-              <p class="text-sm text-slate-300 mb-4">{evento.organizacion}</p>
-            {/if}
-            
-            <!-- Nueva información: fecha y lugar, con renderizado condicional -->
-            <div class="text-sm mb-4">
-              {#if evento.fecha}
-                <p class="font-medium">📅 Fecha: <span class="font-normal text-slate-300">{evento.fecha}</span></p>
-              {/if}
-              {#if evento.lugar}
-                <p class="font-medium">📍 Lugar: <span class="font-normal text-slate-300">{evento.lugar}</span></p>
-              {/if}
-            </div>
-
-            <!-- Descripción recortada y botón "Leer más" -->
-            {#if evento.descripcion}
-              <!-- Usamos line-clamp-3 para cortar el texto de forma elegante -->
-              <p class="text-sm text-slate-400 flex-grow mb-2 line-clamp-3">
-                {evento.descripcion}
-              </p>
-              <!-- Mostramos "Leer más" solo si la descripción es lo suficientemente larga -->
-              {#if evento.descripcion.length > 100}
-                <button on:click|stopPropagation={() => openModal(evento)} class="text-blue-400 hover:text-blue-300 text-sm font-medium">
-                  Leer más...
-                </button>
-              {/if}
-            {/if}
-          </div>
-        </div>
-      {/each}
-    {:else}
-      <p class="text-slate-400 col-span-full text-center">No hay eventos disponibles en esta categoría.</p>
-    {/if}
-  </div>
-
-  <!-- Aclaración sobre la IA -->
-  <div class="mt-12 text-center text-sm text-slate-400">
-    <p>
-      ℹ️ Esta información ha sido generada y procesada por una inteligencia artificial. Se recomienda verificar los datos en las fuentes originales.
-    </p>
-  </div>
-</div>
-
-<!-- Modal para mostrar la descripción completa -->
-{#if modalOpen && selectedEvent}
-  <div class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
-    <div class="bg-slate-800 rounded-2xl p-8 max-w-2xl w-full text-white shadow-2xl relative">
-      <button on:click={closeModal} class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors duration-200">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-
-      <!-- Contenido del modal -->
-      <div class="mb-4">
-        <span class="text-sm font-semibold px-3 py-1 rounded-full text-white {getEventTypeClass(selectedEvent.tipoEvento)}">
-          {selectedEvent.tipoEvento.charAt(0).toUpperCase() + selectedEvent.tipoEvento.slice(1)}
-        </span>
-      </div>
-      <h3 class="text-2xl font-bold mb-2">{selectedEvent.nombre}</h3>
-      {#if selectedEvent.organizacion}
-        <p class="text-sm text-slate-300 mb-4">{selectedEvent.organizacion}</p>
-      {/if}
-      <div class="text-sm mb-4">
-        {#if selectedEvent.fecha}
-          <p class="font-medium">📅 Fecha: <span class="font-normal text-slate-300">{selectedEvent.fecha}</span></p>
-        {/if}
-        {#if selectedEvent.lugar}
-          <p class="font-medium">📍 Lugar: <span class="font-normal text-slate-300">{selectedEvent.lugar}</span></p>
-        {/if}
-      </div>
-      <p class="text-sm text-slate-400 mb-6">{selectedEvent.descripcion}</p>
-      <a href={selectedEvent.link} target="_blank" rel="noopener noreferrer" 
-         class="inline-block text-center bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg">
-        Ver más detalles
-      </a>
-    </div>
-  </div>
-{/if}
-
-<!-- Puedes agregar estilos CSS adicionales aquí si lo deseas -->
-<style lang="postcss">
-  /*
-    @tailwind base;
-    @tailwind components;
-    @tailwind utilities;
-  */
+<style>
+  .antenna{padding-bottom:48px}.antenna>header{padding:52px 5%;background:var(--navy);color:white}.antenna>header .eyebrow{color:var(--lime)}.antenna>header h1{font-size:2.5rem;margin:7px 0}.antenna>header p:last-child{color:#c2ced9;margin:0;max-width:650px}.controls{padding:28px 5%;display:flex;justify-content:space-between;align-items:end;gap:20px}.tabs{display:flex;background:#e9edf0;border-radius:12px;padding:4px}.tabs button{border:0;background:transparent;padding:11px 18px;border-radius:9px;color:#617389;font-weight:700}.tabs button.active{background:var(--navy);color:white}.controls label{font-size:.75rem;text-transform:uppercase;font-weight:800;color:#718198}.controls select{display:block;margin-top:6px;min-width:210px}.cards{padding:0 5%;display:grid;grid-template-columns:repeat(4,1fr);gap:22px}.event-card{min-height:315px;padding:22px;display:flex;flex-direction:column;background:white;border:1px solid #d6dee6;border-radius:17px;box-shadow:0 8px 24px #0a203a0c;transition:.18s;cursor:pointer;color:var(--navy);text-align:left}.event-card:hover{transform:translateY(-3px);box-shadow:0 14px 30px #0a203a18;border-color:#a9bbca}.event-type{align-self:flex-start;background:var(--lime);padding:5px 11px;border-radius:20px;font-size:.68rem;font-weight:800}.cards h2{font-size:1.08rem;line-height:1.25;margin:14px 0 6px}.organization{color:#6f8095;font-size:.78rem}.metadata{display:flex;gap:12px;flex-wrap:wrap;color:#586a80;font-size:.72rem}.description{color:#66778b;font-size:.8rem;line-height:1.5;display:-webkit-box;-webkit-line-clamp:4;line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}.more{margin-top:auto;align-self:flex-start;color:#779800;font-weight:800;padding:8px 0}.notice,.empty{margin:20px 5%;padding:25px;border:1px solid #d5dee6;border-radius:14px;background:white;text-align:center}.disclaimer{text-align:center;color:#75869a;font-size:.73rem;margin:42px 5% 0}.modal-backdrop{position:fixed;inset:0;background:#07182cbb;z-index:3000;display:grid;place-items:center;padding:20px}.modal{position:relative;width:min(620px,100%);max-height:90vh;overflow:auto;background:white;border-radius:20px;padding:34px}.modal h2{margin:18px 0 5px}.modal-description{line-height:1.6;color:#596b80;margin:22px 0}.modal .close{position:absolute;right:18px;top:14px;border:0;background:none;font-size:1.7rem}.modal .btn-primary{width:100%}@media(max-width:1100px){.cards{grid-template-columns:repeat(2,1fr)}}@media(max-width:650px){.antenna>header{padding:36px 18px}.antenna>header h1{font-size:2rem}.controls{padding:20px 16px;align-items:stretch;flex-direction:column}.tabs{width:100%}.tabs button{flex:1}.controls label,.controls select{width:100%}.cards{padding:0 16px;grid-template-columns:1fr}.event-card{min-height:260px}.modal{padding:26px 20px}}
 </style>

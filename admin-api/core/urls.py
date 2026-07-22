@@ -17,9 +17,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
     TokenRefreshView,
 )
+from adminApi.views import EmailTokenObtainPairView, RegisterView
 
 # from .views import BasicAuthSCIMView
 # from django_scim.routers import DefaultRouter
@@ -29,7 +29,8 @@ from rest_framework_simplejwt.views import (
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/auth/register/', RegisterView.as_view(), name='register'),
+    path('api/token/', EmailTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/', include('adminApi.urls')),
     # path("scim/v2/", include((router.urls, "scim"), namespace="scim")),

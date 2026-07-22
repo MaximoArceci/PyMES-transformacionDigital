@@ -1,32 +1,27 @@
-export const load = async () => {
+import { authenticatedApi } from '$lib/server/api';
+import type { FilterOptions, Pyme } from '$lib/types';
+
+export const load = async ({ fetch, cookies, url }) => {
+  const allowed = ['search', 'work_type', 'enterprise_type', 'sector', 'maturity_band'];
+  const query = new URLSearchParams();
+  for (const key of allowed) { const value = url.searchParams.get(key); if (value) query.set(key, value); }
   try {
-    const response = await fetch('https://adaptable-courage-production.up.railway.app/api/pyme/', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Basic YWRtaW46cGFzc3dvcmQ='
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`Error al obtener las pymes: ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    const pymes = data.map((pyme: any) => ({
-      name: pyme.name,
-      lat: parseFloat(pyme.latitud.replace(',', '.')),
-      lng: parseFloat(pyme.longitud.replace(',', '.')),
-      trabajoRealizado: pyme.work_type,
-      tipoEmpresa: pyme.enterprise_type,
-      sector: pyme.sector,
-      nivelMaduracion: pyme.nivelMaduracion.charAt(0).toUpperCase() + pyme.nivelMaduracion.slice(1)
-    }));
-
-    return { pymes };
-  } catch (e) {
-    console.error('Error al obtener las pymes desde el endpoint:', e);
-    throw e;
+    const [companiesResponse, optionsResponse] = await Promise.all([
+      authenticatedApi(fetch, cookies, `/pymes/?${query}`),
+      authenticatedApi(fetch, cookies, '/pymes/options/')
+    ]);
+    if (!companiesResponse.ok || !optionsResponse.ok) throw new Error('API unavailable');
+    return {
+      pymes: await companiesResponse.json() as Pyme[],
+      options: await optionsResponse.json() as FilterOptions,
+      filters: Object.fromEntries(query), error: null
+    };
+  } catch {
+    return {
+      pymes: [] as Pyme[],
+      options: { work_types: [], enterprise_types: [], sectors: [], provinces: [] } as FilterOptions,
+      filters: Object.fromEntries(query),
+      error: 'No pudimos cargar las empresas. Verificá la conexión e intentá nuevamente.'
+    };
   }
 };
