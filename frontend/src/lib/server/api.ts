@@ -1,12 +1,16 @@
 import { env } from '$env/dynamic/private';
+import { dev } from '$app/environment';
 import type { Cookies } from '@sveltejs/kit';
 
-const API_BASE = (env.PRIVATE_API_BASE_URL || 'http://localhost:9000/api').replace(/\/$/, '');
+const DEFAULT_API_BASE = dev
+  ? 'http://localhost:9000/api'
+  : 'https://adaptable-courage-production.up.railway.app/api';
+const API_BASE = (env.PRIVATE_API_BASE_URL || DEFAULT_API_BASE).replace(/\/$/, '');
 const cookieOptions = {
   path: '/',
   httpOnly: true,
   sameSite: 'lax' as const,
-  secure: env.NODE_ENV === 'production'
+  secure: !dev
 };
 
 export function setSession(cookies: Cookies, tokens: { access: string; refresh: string }, email: string) {
