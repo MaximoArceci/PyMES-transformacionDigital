@@ -2,7 +2,7 @@ version: '3'
 services:
   frontend:
     hostname: frontend
-    image: oven/bun:1.1.25
+    image: node:20-slim
     working_dir: /app
     expose:
       - 5173
@@ -12,7 +12,7 @@ services:
       - ./frontend:/app
     networks:
       - internal
-    command: bash -c 'bun install && bun run dev --host'
+    command: bash -c 'npm ci && npm run build && PORT=$${PORT:-5173} npm run start'
   
   django:
     image: python:3.12-slim
