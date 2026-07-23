@@ -6,7 +6,8 @@
 		"node": "20.x"
 	},
 	"scripts": {
-		"dev": "vite dev",
+		"dev": "npm run build && npm run start",
+		"dev:local": "vite dev",
 		"build": "vite build",
 		"start": "PROTOCOL_HEADER=x-forwarded-proto HOST_HEADER=x-forwarded-host node build",
 		"preview": "vite preview",
