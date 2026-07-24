@@ -1,5 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  import BrandLogo from '$lib/components/BrandLogo.svelte';
   export let user: { email: string } | null = null;
   let open = false;
   const links = [
@@ -10,7 +11,7 @@
 </script>
 
 <header class="app-header">
-  <a class="brand" href="/pymes"><span class="brand-mark">P</span><span>PyMEs</span></a>
+  <BrandLogo />
   <button class="mobile-menu" aria-label="Abrir navegación" on:click={() => open = !open}>☰</button>
   <nav class:open aria-label="Navegación principal">
     {#each links as link}
@@ -25,8 +26,6 @@
 
 <style>
   .app-header { height:72px; padding:0 3.5vw; display:flex; align-items:center; gap:36px; background:#fff; border-bottom:1px solid #dce2e8; box-shadow:0 2px 8px #0a203a12; position:relative; z-index:1000; }
-  .brand { display:flex; align-items:center; gap:9px; font-weight:850; font-size:1.12rem; color:var(--navy); }
-  .brand-mark { width:30px; height:30px; display:grid; place-items:center; background:var(--lime); border-radius:9px 9px 9px 2px; }
   nav { display:flex; align-items:center; gap:8px; margin-left:auto; }
   nav a, nav button { border:0; background:transparent; color:#5d6f85; font-weight:650; padding:10px 13px; border-radius:8px; }
   nav a:hover, nav a.active { color:var(--navy); background:#f1f5f7; }
