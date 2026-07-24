@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto, invalidateAll } from '$app/navigation';
   import { onMount } from 'svelte';
+  import { parseCoordinates } from '$lib/coordinates';
   import type { Pyme } from '$lib/types';
   export let data;
 
@@ -16,11 +17,7 @@
   let sector = data.filters.sector ?? '';
   let maturityBand = data.filters.maturity_band ?? '';
 
-  const coordinates = (pyme: Pyme) => {
-    const lat = Number(String(pyme.latitud ?? '').replace(',', '.'));
-    const lng = Number(String(pyme.longitud ?? '').replace(',', '.'));
-    return Number.isFinite(lat) && Number.isFinite(lng) ? [lat, lng] : null;
-  };
+  const coordinates = (pyme: Pyme) => parseCoordinates(pyme);
 
   function selectCompany(pyme: Pyme) {
     selected = pyme;

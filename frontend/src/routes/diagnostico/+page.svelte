@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto, invalidateAll } from '$app/navigation';
   import { onMount } from 'svelte';
+  import { parseCoordinates } from '$lib/coordinates';
   import type { ChartDatum, Pyme } from '$lib/types';
   export let data;
   let province = data.filters.province ?? '';
@@ -30,8 +31,7 @@
     goto(`/diagnostico?${query}`);
   }
   function validPoint(company: Pyme) {
-    const lat=Number(String(company.latitud).replace(',','.')), lng=Number(String(company.longitud).replace(',','.'));
-    return Number.isFinite(lat)&&Number.isFinite(lng)?[lat,lng]:null;
+    return parseCoordinates(company);
   }
   onMount(() => {
     let disposed=false;
