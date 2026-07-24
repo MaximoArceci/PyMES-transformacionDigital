@@ -17,7 +17,10 @@
   let sector = data.filters.sector ?? '';
   let maturityBand = data.filters.maturity_band ?? '';
 
+  const BUENOS_AIRES_CENTER: [number, number] = [-34.6037, -58.3816];
+  const BUENOS_AIRES_ZOOM = 11;
   const coordinates = (pyme: Pyme) => parseCoordinates(pyme);
+  const hasActiveFilters = () => Object.values(data.filters).some(Boolean);
 
   function selectCompany(pyme: Pyme) {
     selected = pyme;
@@ -41,7 +44,12 @@
       });
       L.marker(point, { icon, title: pyme.name }).on('click', () => selectCompany(pyme)).addTo(markerLayer);
     }
-    if (bounds.length && !selected) map.fitBounds(bounds, { padding: [55, 55], maxZoom: 12 });
+    if (!selected && hasActiveFilters()) {
+      if (bounds.length === 1) map.setView(bounds[0], 13);
+      else if (bounds.length > 1) map.fitBounds(bounds, { padding: [55, 55], maxZoom: 12 });
+    } else if (!selected) {
+      map.setView(BUENOS_AIRES_CENTER, BUENOS_AIRES_ZOOM, { animate: false });
+    }
   }
 
   function applyFilters() {
@@ -58,7 +66,7 @@
     (async () => {
       L = await import('leaflet'); await import('leaflet/dist/leaflet.css');
       if (disposed) return;
-      map = L.map('company-map', { zoomControl: false }).setView([-34.60, -58.48], 11);
+      map = L.map('company-map', { zoomControl: false }).setView(BUENOS_AIRES_CENTER, BUENOS_AIRES_ZOOM);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
       L.control.zoom({ position: 'topleft' }).addTo(map); renderMarkers();
       window.addEventListener('keydown', handleKeys);
