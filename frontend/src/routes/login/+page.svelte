@@ -11,7 +11,7 @@
   <section class="auth-form-wrap">
     <form method="POST" use:enhance={() => { submitting = true; return async ({ update }) => { await update(); submitting = false; }; }}>
       <div class="form-brand"><BrandLogo variant="auth" href="/login" /></div>
-      <h1>Bienvenido de vuelta</h1>
+      <h1>Bienvenido</h1>
       <p>Iniciá sesión en tu cuenta</p>
       {#if form?.error}
         <div class="form-error" role="alert">
