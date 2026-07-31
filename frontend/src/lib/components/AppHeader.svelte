@@ -5,8 +5,7 @@
   let open = false;
   const links = [
     { href: '/pymes', label: 'Mapa' },
-    { href: '/diagnostico', label: 'Diagnóstico' },
-    { href: '/antenaTecnologica', label: 'Antena' }
+    { href: '/diagnostico', label: 'Diagnóstico' }
   ];
 </script>
 
